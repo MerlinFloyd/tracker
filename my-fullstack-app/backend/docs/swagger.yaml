@@ -1,0 +1,84 @@
+basePath: /api
+definitions:
+  api.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@yourcompany.com
+    name: API Support
+    url: http://www.yourcompany.com/support
+  description: A service to track and store Ethereum wallet balances
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Ethereum Balance Tracker API
+  version: "1.0"
+paths:
+  /eth/balance:
+    get:
+      consumes:
+      - application/json
+      description: Returns the balance of an Ethereum address in wei and ETH
+      parameters:
+      - description: Ethereum address (0x format)
+        in: query
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Get Ethereum address balance
+      tags:
+      - ethereum
+  /eth/store-balance:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves and stores the balance of an Ethereum address
+      parameters:
+      - description: Ethereum address (0x format)
+        in: query
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Store Ethereum address balance
+      tags:
+      - ethereum
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
