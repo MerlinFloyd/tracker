@@ -3,15 +3,11 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"math/big"
 	"net/http"
 	"os"
-	"time"
 
 	"my-fullstack-app/backend/internal/database"
-	"my-fullstack-app/backend/internal/models"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -45,6 +41,14 @@ func InitEthClient() error {
 }
 
 // HealthCheckHandler handles the /health endpoint
+// @Summary      Check API health status
+// @Description  Returns health status of the API, including Ethereum client and database connectivity
+// @Tags         system
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  Response  "API is healthy"
+// @Failure      503  {object}  Response  "One or more components are in degraded state"
+// @Router       /health [get]
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -99,163 +103,5 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}
 
-	json.NewEncoder(w).Encode(response)
-}
-
-// BlockNumberHandler returns the latest Ethereum block number
-func BlockNumberHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	if ethClient == nil {
-		if err := InitEthClient(); err != nil {
-			http.Error(w, "Failed to initialize Ethereum client", http.StatusInternalServerError)
-			return
-		}
-	}
-
-	// Get the latest block number
-	blockNumber, err := ethClient.BlockNumber(context.Background())
-	if err != nil {
-		http.Error(w, "Failed to get block number", http.StatusInternalServerError)
-		return
-	}
-
-	response := Response{
-		Message: "Current Ethereum block number",
-		Data:    blockNumber,
-	}
-	json.NewEncoder(w).Encode(response)
-}
-
-// GetBalanceHandler returns the balance for a given Ethereum address
-// @Summary      Get Ethereum address balance
-// @Description  Returns the balance of an Ethereum address in wei and ETH
-// @Tags         ethereum
-// @Accept       json
-// @Produce      json
-// @Param        address  query     string  true  "Ethereum address (0x format)"
-// @Success      200      {object}  Response
-// @Failure      400      {object}  Response
-// @Failure      500      {object}  Response
-// @Router       /eth/balance [get]
-func GetBalanceHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	address := r.URL.Query().Get("address")
-	if address == "" {
-		http.Error(w, "Address parameter is required", http.StatusBadRequest)
-		return
-	}
-
-	if ethClient == nil {
-		if err := InitEthClient(); err != nil {
-			http.Error(w, "Failed to initialize Ethereum client", http.StatusInternalServerError)
-			return
-		}
-	}
-
-	// Get the balance
-	account := common.HexToAddress(address)
-	balance, err := ethClient.BalanceAt(context.Background(), account, nil)
-	if err != nil {
-		http.Error(w, "Failed to get account balance", http.StatusInternalServerError)
-		return
-	}
-
-	// Convert wei to ETH
-	// 1 ETH = 10^18 wei
-	weiBalance := new(big.Float).SetInt(balance)
-	ethBalance := new(big.Float).Quo(weiBalance, big.NewFloat(1e18))
-
-	response := Response{
-		Message: "Account balance retrieved",
-		Data: map[string]interface{}{
-			"wei": balance.String(),
-			"eth": ethBalance.Text('f', 18), // Format with up to 18 decimal places
-		},
-	}
-	json.NewEncoder(w).Encode(response)
-}
-
-// StoreBalanceHandler retrieves the balance for an Ethereum address and stores it in the database
-// @Summary      Store Ethereum address balance
-// @Description  Retrieves and stores the balance of an Ethereum address
-// @Tags         ethereum
-// @Accept       json
-// @Produce      json
-// @Param        address  query     string  true  "Ethereum address (0x format)"
-// @Success      200      {object}  Response
-// @Failure      400      {object}  Response
-// @Failure      500      {object}  Response
-// @Router       /eth/store-balance [get]
-func StoreBalanceHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	// Get address from query parameters
-	address := r.URL.Query().Get("address")
-	if address == "" {
-		http.Error(w, "Address parameter is required", http.StatusBadRequest)
-		return
-	}
-
-	// Validate Ethereum address format
-	if !common.IsHexAddress(address) {
-		http.Error(w, "Invalid Ethereum address format", http.StatusBadRequest)
-		return
-	}
-
-	if ethClient == nil {
-		if err := InitEthClient(); err != nil {
-			http.Error(w, "Failed to initialize Ethereum client", http.StatusInternalServerError)
-			return
-		}
-	}
-
-	// Get the balance
-	account := common.HexToAddress(address)
-	balance, err := ethClient.BalanceAt(context.Background(), account, nil)
-	if err != nil {
-		http.Error(w, "Failed to get account balance", http.StatusInternalServerError)
-		return
-	}
-
-	// Convert wei to ETH
-	weiBalance := new(big.Float).SetInt(balance)
-	ethBalance := new(big.Float).Quo(weiBalance, big.NewFloat(1e18))
-	ethBalanceStr := ethBalance.Text('f', 18)
-
-	// Connect to the database
-	db, err := database.Connect()
-	if err != nil {
-		http.Error(w, "Database connection failed", http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
-
-	// Create a balance record
-	balanceRecord := models.BalanceRecord{
-		Address:    address,
-		Balance:    balance.String(),
-		BalanceETH: ethBalanceStr,
-		FetchedAt:  time.Now(),
-	}
-
-	// Store the balance in the database
-	balanceID, err := database.StoreBalance(db, balanceRecord)
-	if err != nil {
-		http.Error(w, "Failed to store balance in database", http.StatusInternalServerError)
-		return
-	}
-
-	response := Response{
-		Message: "Account balance retrieved and stored",
-		Data: map[string]interface{}{
-			"id":        balanceID,
-			"address":   address,
-			"wei":       balance.String(),
-			"eth":       ethBalanceStr,
-			"timestamp": balanceRecord.FetchedAt,
-		},
-	}
 	json.NewEncoder(w).Encode(response)
 }

@@ -10,7 +10,7 @@ services:
       - DB_USER=app
       - DB_PASSWORD=yourpassword
       - DB_NAME=appdb
-      - SWAGGER_HOST=localhost:8081  # For correct swagger base URL
+      - SWAGGER_HOST=localhost:8080  # For correct swagger base URL
     depends_on:
       migrations:
         condition: service_completed_successfully
@@ -19,6 +19,30 @@ services:
         - action: rebuild
           path: ./backend
           target: /app
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_FIREBASE_API_KEY=AIzaSyCuFTS1L0j2nYIzDYyd0SaCtz03CN8oxdQ
+      - REACT_APP_FIREBASE_AUTH_DOMAIN=horizon-7fdc6.firebaseapp.com
+      - REACT_APP_FIREBASE_PROJECT_ID=horizon-7fdc6
+      - REACT_APP_FIREBASE_STORAGE_BUCKET=horizon-7fdc6.appspot.com
+      - REACT_APP_FIREBASE_MESSAGING_SENDER_ID=441228956462
+      - REACT_APP_FIREBASE_APP_ID=1:441228956462:web:adc9da22f8e1811e26e0bf
+    depends_on:
+      - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+        - action: rebuild
+          path: ./frontend/
+          target: package*.json
 
   db:
     image: postgres:14

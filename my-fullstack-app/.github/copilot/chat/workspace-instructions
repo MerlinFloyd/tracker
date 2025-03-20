@@ -1,0 +1,67 @@
+You are assisting with a full stack application that follows clean architecture principles.
+
+TECH STACK:
+- Backend: Go API using gorilla/mux for routing and sqlx for database
+- Frontend: React 17+ with functional components and hooks
+- Database: PostgreSQL with migrations using golang-migrate
+- Infrastructure: Docker and Docker Compose for containerization
+- Authentication: JWT-based authentication flow
+- Documentation: Swagger for API documentation
+
+BACKEND ARCHITECTURE:
+- Clean architecture with clear separation of concerns:
+  - Domain: Core business logic and entities
+  - Application: Use cases and business rules
+  - Infrastructure: Database, external APIs, etc.
+  - API: HTTP handlers, middleware, and routing
+- Follow Go standard project layout (github.com/golang-standards/project-layout)
+- Use dependency injection for services and handlers
+- Program to interfaces for better testability and flexibility
+- Use repository pattern for data access
+- Implement error handling with custom error types and proper HTTP status codes
+- Context usage for request cancellation and timeouts
+
+FRONTEND ARCHITECTURE:
+- Component-based architecture with functional components
+- State management using React Context or Redux Toolkit for complex state
+- Custom hooks for reusable logic
+- API client for backend communication
+- Responsive design using CSS modules or styled-components
+- Route-based code splitting for performance
+- Form handling with React Hook Form
+
+DATABASE:
+- Use transactions for multi-step operations
+- Follow migration-based schema evolution
+- Implement repository pattern for data access
+- Use prepared statements for security
+- Consider query performance and indexing
+- Implement proper error handling for database operations
+
+TESTING:
+- Unit tests for business logic and utilities
+- Integration tests for API endpoints
+- Database tests using testcontainers
+- Mock interfaces for dependencies in unit tests
+- Frontend tests using React Testing Library
+- Consider table-driven tests in Go
+
+CODE QUALITY:
+- Follow Go idioms and standard practices
+- Use consistent error handling patterns
+- Validate input at API boundaries
+- Implement proper logging
+- Apply consistent code formatting
+- Consider performance implications
+- Use meaningful variable and function names
+
+SECURITY:
+- Implement proper authentication and authorization
+- Use parameter binding to prevent SQL injection
+- Validate and sanitize all user input
+- Set appropriate CORS policies
+- Follow secure password storage practices
+- Use HTTPS in production
+- Consider rate limiting for API endpoints
+
+When providing code, prioritize readability, maintainability, and adherence to the architectural patterns described above.

@@ -4,8 +4,12 @@ FROM golang:1.23-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install swag
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+# Install swag CLI and dependencies
+RUN apk add --no-cache git && \
+    go install github.com/swaggo/swag/cmd/swag@latest
+
+# Add the Go bin to PATH to ensure swag is available
+ENV PATH="${PATH}:/root/go/bin"
 
 # Copy go mod and sum files
 COPY backend/go.mod backend/go.sum ./
@@ -38,7 +42,7 @@ COPY --from=builder /app/server .
 COPY --from=builder /app/docs ./docs
 
 # Copy the migrations
-COPY /sql/migrations /app/migrations
+COPY sql/migrations /app/migrations
 
 # Copy entrypoint script
 COPY backend/entrypoint.sh /app/entrypoint.sh

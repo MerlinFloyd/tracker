@@ -9,8 +9,10 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "firebase": "^9.23.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-firebase-hooks": "^5.1.1",
     "react-scripts": "4.0.3"
   },
   "eslintConfig": {
@@ -29,5 +31,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "http://localhost:8080"
 }

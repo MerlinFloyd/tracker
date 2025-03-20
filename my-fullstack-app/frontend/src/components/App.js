@@ -1,13 +1,28 @@
 import React from 'react';
-import './styles/index.css';
+import BlockInfo from './BlockInfo';
+import Login from './Login';
+import { AuthProvider } from '../contexts/AuthContext';
+import '../styles/App.css';
 
-const App = () => {
-    return (
-        <div className="App">
-            <h1>Welcome to My Fullstack App</h1>
-            <p>This is the root component of the React application.</p>
-        </div>
-    );
-};
+function App() {
+  return (
+    <AuthProvider>
+      <div className="app">
+        <header className="app-header">
+          <h1>Ethereum Balance Tracker</h1>
+        </header>
+        
+        <main className="app-content">
+          <Login />
+          <BlockInfo />
+        </main>
+        
+        <footer className="app-footer">
+          <p>© 2025 Ethereum Balance Tracker</p>
+        </footer>
+      </div>
+    </AuthProvider>
+  );
+}
 
 export default App;

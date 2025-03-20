@@ -19,6 +19,8 @@ This is the frontend part of the My Fullstack App project, built using React. Th
 
 ## Getting Started
 
+0. **Install NPM**: Run 'sudo apt install npm' to install NPM for the front end
+
 1. **Install Dependencies**: Run `npm install` in the `frontend` directory to install the required dependencies.
 
 2. **Run the Application**: Use `npm start` to start the development server. The application will be available at `http://localhost:3000`.
