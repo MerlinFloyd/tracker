@@ -31,3 +31,21 @@
   padding: 15px;
   font-size: 0.9rem;
 }
+
+.authentication-required {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.authentication-required h2 {
+  color: #333;
+  margin-top: 0;
+}
+
+.authentication-required p {
+  color: #666;
+}

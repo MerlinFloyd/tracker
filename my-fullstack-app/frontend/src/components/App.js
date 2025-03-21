@@ -1,8 +1,26 @@
 import React from 'react';
 import BlockInfo from './BlockInfo';
 import Login from './Login';
-import { AuthProvider } from '../contexts/AuthContext';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import '../styles/App.css';
+
+// Protected component that only renders for authenticated users
+const ProtectedContent = () => {
+  const { currentUser } = useAuth();
+  
+  return (
+    <>
+      {currentUser ? (
+        <BlockInfo />
+      ) : (
+        <div className="authentication-required">
+          <h2>Authentication Required</h2>
+          <p>Please sign in with Google to view Ethereum blockchain data.</p>
+        </div>
+      )}
+    </>
+  );
+};
 
 function App() {
   return (
@@ -14,7 +32,7 @@ function App() {
         
         <main className="app-content">
           <Login />
-          <BlockInfo />
+          <ProtectedContent />
         </main>
         
         <footer className="app-footer">

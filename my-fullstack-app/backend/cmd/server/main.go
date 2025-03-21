@@ -5,6 +5,7 @@ import (
 	"my-fullstack-app/backend/internal/api"
 	"my-fullstack-app/backend/internal/blockchain"
 	"my-fullstack-app/backend/internal/logger"
+	"my-fullstack-app/backend/internal/market"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -48,6 +49,12 @@ func main() {
 		logger.Warn().Msgf("Failed to initialize blockchain handler: %v", err)
 	}
 
+	// Initialize market data handlers
+	marketHandler, err := market.NewHandler()
+	if err != nil {
+		logger.Warn().Msgf("Failed to initialize market data handler: %v", err)
+	}
+
 	// Register API routes
 	apiRouter.HandleFunc("/health", api.HealthCheckHandler).Methods("GET")
 
@@ -60,6 +67,12 @@ func main() {
 
 		// You can add the ERC20 token handlers here
 		// apiRouter.HandleFunc("/eth/token-balance", blockchainHandler.GetTokenBalanceHandler).Methods("GET")
+	}
+
+	if marketHandler != nil {
+		apiRouter.HandleFunc("/market/price", marketHandler.GetCurrentPriceHandler).Methods("GET")
+		apiRouter.HandleFunc("/market/historical", marketHandler.GetHistoricalPriceHandler).Methods("GET")
+		logger.Info().Msg("Registered market data endpoints")
 	}
 
 	// Swagger documentation endpoint

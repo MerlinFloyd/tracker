@@ -11,6 +11,8 @@ services:
       - DB_PASSWORD=yourpassword
       - DB_NAME=appdb
       - SWAGGER_HOST=localhost:8080  # For correct swagger base URL
+      - BINANCE_API_KEY=iQwVGLbZOyEkUE1nuexGGuaO6WDEkngG6xYnx7hnB5TOBo4RioLVC1TSOjogUtxk
+      - BINANCE_SECRET_KEY=gBwrMxtCDP4mcQie6uQBrUkgI9nZkTCSthZ4ZQA8feNNf9dbZ4Zy8wn6a6dsewaa
     depends_on:
       migrations:
         condition: service_completed_successfully

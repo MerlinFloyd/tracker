@@ -14,8 +14,10 @@ import (
 // Response is a struct for standard API responses
 // @Description API response format
 type Response struct {
+	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
+	Error   string      `json:"error,omitempty"`
 }
 
 // Global ethclient
